@@ -165,6 +165,7 @@
 
         .movie-details {
             padding: 1.5rem;
+            position: relative;
         }
 
         .movie-title {
@@ -173,12 +174,15 @@
             font-weight: 700;
         }
 
-        /* Styling for the newly added Director field */
-        .movie-director {
+        .movie-director-runtime {
             font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .movie-director-runtime span {
             color: var(--accent-color);
             font-weight: 600;
-            margin-bottom: 0.8rem;
         }
 
         .movie-meta {
@@ -211,6 +215,38 @@
             color: var(--text-muted);
             line-height: 1.6;
             font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-watchlist {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-watchlist:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .btn-watchlist.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .btn-watchlist.active:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
         }
 
         .no-match-message {
@@ -222,6 +258,91 @@
             padding: 1rem;
             border-radius: 6px;
             border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        /* ==========================================
+           WATCHLIST COMPONENT STYLES
+           ========================================== --> */
+        .watchlist-section {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .watchlist-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-color);
+        }
+
+        .watchlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 1rem;
+        }
+
+        .watchlist-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .watchlist-item:hover {
+            transform: scale(1.03);
+        }
+
+        .watchlist-poster {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .watchlist-title {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+
+        .btn-remove-item {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+            font-weight: bold;
+        }
+
+        .btn-remove-item:hover {
+            background-color: var(--accent-color);
+        }
+
+        .watchlist-empty {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.95rem;
         }
 
         @media (min-width: 600px) {
@@ -237,7 +358,7 @@
 
             .movie-details {
                 width: 60%;
-                padding: 2rem;
+                padding: 2.5rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -307,7 +428,7 @@
                         <option value="FR">France</option>
                         <option value="BE">Belgium</option>
                         <option value="CH">Switzerland</option>
-                        <option value="PT">Portugal</option>
+                        <option value="PT">Portuguese</option>
                         <option value="IT">Italy</option>
                         <option value="BR">Brazil</option>
                         <option value="DE">Germany</option>
@@ -360,14 +481,28 @@
                 <img id="movie-img" src="" alt="Movie Poster" class="movie-poster">
                 <div class="movie-details">
                     <h2 id="movie-title" class="movie-title">Movie Title</h2>
-                    <div id="movie-director" class="movie-director">Director: Unknown</div>
+                    <div class="movie-director-runtime">
+                        Director: <span id="movie-director">Unknown</span> | Runtime: <span id="movie-runtime">N/A</span>
+                    </div>
                     <div class="movie-meta">
                         <span id="movie-rating" class="badge badge-rating">Rating</span>
                         <span id="movie-year" class="badge">Year</span>
                         <span id="movie-lang" class="badge">Language</span>
                     </div>
                     <p id="movie-overview" class="movie-overview">Movie description summary...</p>
+                    <div>
+                        <button id="watchlist-btn" class="btn-watchlist">
+                            <span>🔖</span> <span id="watchlist-btn-text">Save to Watchlist</span>
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="watchlist-section">
+            <h2>My Watchlist</h2>
+            <div id="watchlist-grid" class="watchlist-grid">
+                <p class="watchlist-empty">Your watchlist is currently empty. Roll and save some movies!</p>
             </div>
         </section>
     </div>
@@ -379,7 +514,10 @@
             const BASE_URL = "https://api.themoviedb.org/3";
             const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-            // DOM Elements References
+            // State Tracking Variable for the currently targeted movie selection
+            let currentMovie = null;
+
+            // DOM Reference Elements
             const genreSelect = document.getElementById('genre-select');
             const yearSelect = document.getElementById('year-select');
             const langSelect = document.getElementById('lang-select');
@@ -388,23 +526,29 @@
             const ratingMaxSelect = document.getElementById('rating-max-select');
             
             const matchBtn = document.getElementById('match-btn');
+            const watchlistBtn = document.getElementById('watchlist-btn');
+            const watchlistBtnText = document.getElementById('watchlist-btn-text');
+            const watchlistGrid = document.getElementById('watchlist-grid');
             const resultContainer = document.getElementById('result-container');
             const errorMsg = document.getElementById('error-msg');
 
             const movieImg = document.getElementById('movie-img');
             const movieTitle = document.getElementById('movie-title');
             const movieDirector = document.getElementById('movie-director');
+            const movieRuntime = document.getElementById('movie-runtime');
             const movieYear = document.getElementById('movie-year');
             const movieLang = document.getElementById('movie-lang');
             const movieRating = document.getElementById('movie-rating');
             const movieOverview = document.getElementById('movie-overview');
 
-            // English badges dictionary mapper
             const langLabels = { 
                 'en': 'English', 'fr': 'French', 'ja': 'Japanese',
                 'it': 'Italian', 'de': 'German', 'zh': 'Mandarin',
                 'pt': 'Portuguese', 'ru': 'Russian'
             };
+
+            // Initialize app lifecycle execution maps
+            renderWatchlist();
 
             async function fetchRandomMovie() {
                 matchBtn.disabled = true;
@@ -412,15 +556,9 @@
 
                 let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=en-US&include_adult=false&sort_by=popularity.desc`;
 
-                if (genreSelect.value !== 'all') {
-                    url += `&with_genres=${genreSelect.value}`;
-                }
-                if (langSelect.value !== 'all') {
-                    url += `&with_original_language=${langSelect.value}`;
-                }
-                if (countrySelect.value !== 'all') {
-                    url += `&with_origin_country=${countrySelect.value}`;
-                }
+                if (genreSelect.value !== 'all') url += `&with_genres=${genreSelect.value}`;
+                if (langSelect.value !== 'all') url += `&with_original_language=${langSelect.value}`;
+                if (countrySelect.value !== 'all') url += `&with_origin_country=${countrySelect.value}`;
 
                 url += `&vote_average.gte=${ratingMinSelect.value}`;
                 url += `&vote_average.lte=${ratingMaxSelect.value}`;
@@ -461,13 +599,14 @@
                     const randomIndex = Math.floor(Math.random() * filteredList.length);
                     const chosenMovie = filteredList[randomIndex];
 
-                    // Fetch the director's profile details before updating the interface components
-                    const directorName = await fetchDirector(chosenMovie.id);
+                    // Combined asynchronous execution lookup data stream (Credits & Secondary Details query)
+                    const details = await fetchExtendedMovieDetails(chosenMovie.id);
                     
-                    displayMovie(chosenMovie, directorName);
+                    currentMovie = chosenMovie; // Save structural entity context globally
+                    displayMovie(chosenMovie, details.director, details.runtime);
 
                 } catch (err) {
-                    console.error("TMDB Api Error Stream:", err);
+                    console.error("TMDB Core Engine exception handling:", err);
                     showError();
                 } finally {
                     matchBtn.disabled = false;
@@ -475,37 +614,57 @@
                 }
             }
 
-            // Sub-routine asynchronous method to fetch and target technical crew data mapping
-            async function fetchDirector(movieId) {
+            // High-fidelity integrated wrapper function mapping runtime configuration parameters
+            async function fetchExtendedMovieDetails(movieId) {
+                let director = "Unknown Director";
+                let runtime = "N/A";
+                
                 try {
-                    const creditsUrl = `${BASE_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`;
-                    const response = await fetch(creditsUrl);
-                    const creditsData = await response.json();
-                    
+                    // Fetch Crew Credits
+                    const creditsPromise = fetch(`${BASE_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`).then(res => res.json());
+                    // Fetch Core Appendices (Runtime metric calculation data payload source)
+                    const mainDetailsPromise = fetch(`${BASE_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}&language=en-US`).then(res => res.json());
+
+                    const [creditsData, mainData] = await Promise.all([creditsPromise, mainDetailsPromise]);
+
                     if (creditsData && creditsData.crew) {
-                        // Filters layout arrays searching explicitly for structural 'Director' target
-                        const directorObject = creditsData.crew.find(member => member.job === 'Director');
-                        return directorObject ? directorObject.name : "Unknown Director";
+                        const target = creditsData.crew.find(m => m.job === 'Director');
+                        if (target) director = target.name;
                     }
-                    return "Unknown Director";
-                } catch (error) {
-                    console.error("Error looking up technical crew endpoints:", error);
-                    return "Unknown Director";
+
+                    if (mainData && mainData.runtime) {
+                        runtime = formatRuntime(mainData.runtime);
+                    }
+                } catch (e) {
+                    console.error("Error looking up contextual sub-queries:", e);
                 }
+
+                return { director, runtime };
             }
 
-            function displayMovie(movie, director) {
+            // Formats integer minutes to clean 'Xh Ym' standard layout
+            function formatRuntime(minutes) {
+                if (!minutes) return "N/A";
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                return hours > 0 ? `${hours}h ${remainingMinutes}m` : `${remainingMinutes}m`;
+            }
+
+            function displayMovie(movie, director, runtime) {
                 errorMsg.style.display = 'none';
 
                 movieTitle.textContent = movie.title;
-                movieDirector.textContent = `Director: ${director}`;
+                movieDirector.textContent = director;
+                movieRuntime.textContent = runtime;
                 movieOverview.textContent = movie.overview;
                 movieRating.textContent = `⭐ ${movie.vote_average.toFixed(1)}/10`;
                 movieYear.textContent = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
                 movieLang.textContent = langLabels[movie.original_language] || movie.original_language.toUpperCase();
                 
                 movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
-                movieImg.alt = `${movie.title} Official Movie Poster`;
+                movieImg.alt = `${movie.title} Movie Poster`;
+
+                updateWatchlistButtonState(movie.id);
 
                 resultContainer.style.display = 'block';
                 setTimeout(() => {
@@ -517,6 +676,80 @@
                 resultContainer.classList.remove('show');
                 resultContainer.style.display = 'none';
                 errorMsg.style.display = 'block';
+            }
+
+            // ==========================================
+            // WATCHLIST SYSTEM SUBSURFACE SUBSYSTEMS
+            // ==========================================
+            function getWatchlistData() {
+                const data = localStorage.getItem('cinematch_watchlist');
+                return data ? JSON.parse(data) : [];
+            }
+
+            function updateWatchlistButtonState(movieId) {
+                const list = getWatchlistData();
+                const exists = list.some(item => item.id === movieId);
+                
+                if (exists) {
+                    watchlistBtn.classList.add('active');
+                    watchlistBtnText.textContent = "Remove from Watchlist";
+                } else {
+                    watchlistBtn.classList.remove('active');
+                    watchlistBtnText.textContent = "Save to Watchlist";
+                }
+            }
+
+            watchlistBtn.addEventListener('click', () => {
+                if (!currentMovie) return;
+                
+                let list = getWatchlistData();
+                const index = list.findIndex(item => item.id === currentMovie.id);
+
+                if (index > -1) {
+                    list.splice(index, 1); // Remove from list if already present
+                } else {
+                    list.push({
+                        id: currentMovie.id,
+                        title: currentMovie.title,
+                        poster_path: currentMovie.poster_path
+                    });
+                }
+
+                localStorage.setItem('cinematch_watchlist', JSON.stringify(list));
+                updateWatchlistButtonState(currentMovie.id);
+                renderWatchlist();
+            });
+
+            window.removeWatchlistItem = function(movieId) {
+                let list = getWatchlistData();
+                list = list.filter(item => item.id !== movieId);
+                localStorage.setItem('cinematch_watchlist', JSON.stringify(list));
+                
+                if (currentMovie && currentMovie.id === movieId) {
+                    updateWatchlistButtonState(movieId);
+                }
+                renderWatchlist();
+            };
+
+            function renderWatchlist() {
+                const list = getWatchlistData();
+                watchlistGrid.innerHTML = '';
+
+                if (list.length === 0) {
+                    watchlistGrid.innerHTML = `<p class="watchlist-empty">Your watchlist is currently empty. Roll and save some movies!</p>`;
+                    return;
+                }
+
+                list.forEach(movie => {
+                    const el = document.createElement('div');
+                    el.className = 'watchlist-item';
+                    el.innerHTML = `
+                        <button class="btn-remove-item" onclick="removeWatchlistItem(${movie.id})">×</button>
+                        <img class="watchlist-poster" src="${IMAGE_BASE_URL}${movie.poster_path}" alt="${movie.title}">
+                        <div class="watchlist-title" title="${movie.title}">${movie.title}</div>
+                    `;
+                    watchlistGrid.appendChild(el);
+                });
             }
 
             matchBtn.addEventListener('click', fetchRandomMovie);
