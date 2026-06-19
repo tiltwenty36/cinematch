@@ -165,4 +165,340 @@
             background-color: #222;
         }
 
-        .movie-details
+        .movie-details {
+            padding: 1.5rem;
+        }
+
+        .movie-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .movie-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background-color: #2f2f2f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .badge-accent {
+            background-color: rgba(229, 9, 20, 0.2);
+            color: var(--accent-color);
+        }
+
+        .badge-rating {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .movie-overview {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .no-match-message {
+            color: #ffc107;
+            font-weight: 600;
+            margin-top: 2rem;
+            display: none;
+            background-color: rgba(255, 193, 7, 0.1);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        @media (min-width: 600px) {
+            .movie-card {
+                flex-direction: row;
+                height: 450px;
+            }
+
+            .movie-poster {
+                width: 40%;
+                height: 100%;
+            }
+
+            .movie-details {
+                width: 60%;
+                padding: 2rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>CinéMatch</h1>
+            <p>Trouve ton film ce soir</p>
+        </header>
+
+        <section class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="genre-select">Genre</label>
+                    <select id="genre-select">
+                        <option value="all">Tous les genres</option>
+                        <option value="28">Action</option>
+                        <option value="35">Comédie</option>
+                        <option value="18">Drame</option>
+                        <option value="878">Science-Fiction</option>
+                        <option value="27">Horreur</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="year-select">Année</label>
+                    <select id="year-select">
+                        <option value="all">Toutes les époques</option>
+                        <option value="50s">Années 50</option>
+                        <option value="60s">Années 60</option>
+                        <option value="70s">Années 70</option>
+                        <option value="80s">Années 80</option>
+                        <option value="90s">Années 90</option>
+                        <option value="2000s">Années 2000</option>
+                        <option value="2010s">Années 2010</option>
+                        <option value="recent">Récent (2020+)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="lang-select">Langue</label>
+                    <select id="lang-select">
+                        <option value="all">Toutes les langues</option>
+                        <option value="fr">Français</option>
+                        <option value="en">Anglais</option>
+                        <option value="ja">Japonais</option>
+                        <option value="it">Italien</option>
+                        <option value="de">Allemand</option>
+                        <option value="zh">Mandarin</option>
+                        <option value="pt">Portugais</option>
+                        <option value="ru">Russe</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="country-select">Pays d'origine</label>
+                    <select id="country-select">
+                        <option value="all">Tous les pays</option>
+                        <option value="FR">France</option>
+                        <option value="BE">Belgique</option>
+                        <option value="CH">Suisse</option>
+                        <option value="GB">Royaume-Uni</option>
+                        <option value="PT">Portugal</option>
+                        <option value="IT">Italie</option>
+                        <option value="BR">Brésil</option>
+                        <option value="US">États-Unis</option>
+                        <option value="DE">Allemagne</option>
+                        <option value="CN">Chine</option>
+                        <option value="HK">Hong Kong</option>
+                        <option value="JP">Japon</option>
+                        <option value="TW">Taïwan</option>
+                        <option value="RU">Russie</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Fourchette de Notes</label>
+                    <div class="rating-range-container">
+                        <select id="rating-min-select">
+                            <option value="1">Min : 1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                        <select id="rating-max-select">
+                            <option value="10">Max : 10</option>
+                            <option value="9">9</option>
+                            <option value="8">8</option>
+                            <option value="7">7</option>
+                            <option value="6">6</option>
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button id="match-btn" class="btn-trigger">Sélectionner un film au hasard</button>
+        </section>
+
+        <div id="error-msg" class="no-match-message">
+            Aucun film ne correspond à cette recherche ultra-précise, tentez une autre combinaison !
+        </div>
+
+        <section id="result-container" class="result-section">
+            <div class="movie-card">
+                <img id="movie-img" src="" alt="Affiche du film" class="movie-poster">
+                <div class="movie-details">
+                    <h2 id="movie-title" class="movie-title">Titre du film</h2>
+                    <div class="movie-meta">
+                        <span id="movie-rating" class="badge badge-rating">Note</span>
+                        <span id="movie-year" class="badge">Année</span>
+                        <span id="movie-lang" class="badge">Langue</span>
+                    </div>
+                    <p id="movie-overview" class="movie-overview">Résumé du film...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const TMDB_API_KEY = "a22cc070653d990b7947884e821738de";
+            const BASE_URL = "https://api.themoviedb.org/3";
+            const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+
+            // Éléments du DOM
+            const genreSelect = document.getElementById('genre-select');
+            const yearSelect = document.getElementById('year-select');
+            const langSelect = document.getElementById('lang-select');
+            const countrySelect = document.getElementById('country-select');
+            const ratingMinSelect = document.getElementById('rating-min-select');
+            const ratingMaxSelect = document.getElementById('rating-max-select');
+            
+            const matchBtn = document.getElementById('match-btn');
+            const resultContainer = document.getElementById('result-container');
+            const errorMsg = document.getElementById('error-msg');
+
+            const movieImg = document.getElementById('movie-img');
+            const movieTitle = document.getElementById('movie-title');
+            const movieYear = document.getElementById('movie-year');
+            const movieLang = document.getElementById('movie-lang');
+            const movieRating = document.getElementById('movie-rating');
+            const movieOverview = document.getElementById('movie-overview');
+
+            // Traduction des ISO de langues étendu
+            const langLabels = { 
+                'en': 'Anglais', 'fr': 'Français', 'ja': 'Japonais',
+                'it': 'Italien', 'de': 'Allemand', 'zh': 'Mandarin',
+                'pt': 'Portugais', 'ru': 'Russe'
+            };
+
+            async function fetchRandomMovie() {
+                matchBtn.disabled = true;
+                matchBtn.textContent = "Recherche en cours...";
+
+                // Base de la requête Discover (Tri par popularité, contenu fr, pas de contenu adulte)
+                let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=fr-FR&include_adult=false&sort_by=popularity.desc`;
+
+                // 1. Filtre Genre
+                if (genreSelect.value !== 'all') {
+                    url += `&with_genres=${genreSelect.value}`;
+                }
+
+                // 2. Filtre Langue Originale
+                if (langSelect.value !== 'all') {
+                    url += `&with_original_language=${langSelect.value}`;
+                }
+
+                // 3. Filtre Pays d'origine
+                if (countrySelect.value !== 'all') {
+                    url += `&with_origin_country=${countrySelect.value}`;
+                }
+
+                // 4. Filtres Fourchette de Notes (gte = supérieur ou égal / lte = inférieur ou égal)
+                url += `&vote_average.gte=${ratingMinSelect.value}`;
+                url += `&vote_average.lte=${ratingMaxSelect.value}`;
+
+                // 5. Filtre Année (Plages de dates par décennies)
+                if (yearSelect.value !== 'all') {
+                    if (yearSelect.value === '50s') url += `&primary_release_date.gte=1950-01-01&primary_release_date.lte=1959-12-31`;
+                    if (yearSelect.value === '60s') url += `&primary_release_date.gte=1960-01-01&primary_release_date.lte=1969-12-31`;
+                    if (yearSelect.value === '70s') url += `&primary_release_date.gte=1970-01-01&primary_release_date.lte=1979-12-31`;
+                    if (yearSelect.value === '80s') url += `&primary_release_date.gte=1980-01-01&primary_release_date.lte=1989-12-31`;
+                    if (yearSelect.value === '90s') url += `&primary_release_date.gte=1990-01-01&primary_release_date.lte=1999-12-31`;
+                    if (yearSelect.value === '2000s') url += `&primary_release_date.gte=2000-01-01&primary_release_date.lte=2009-12-31`;
+                    if (yearSelect.value === '2010s') url += `&primary_release_date.gte=2010-01-01&primary_release_date.lte=2019-12-31`;
+                    if (yearSelect.value === 'recent') url += `&primary_release_date.gte=2020-01-01`;
+                }
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!data.results || data.results.length === 0) {
+                        showError();
+                        return;
+                    }
+
+                    // Sélection de page aléatoire intelligente (bloquée au top 10 des pages max)
+                    const maxPages = Math.min(data.total_pages, 10);
+                    const randomPage = Math.floor(Math.random() * maxPages) + 1;
+
+                    const finalResponse = await fetch(`${url}&page=${randomPage}`);
+                    const finalData = await finalResponse.json();
+
+                    // Sécurisation : filtrage pour s'assurer d'avoir un résumé et un poster
+                    const filteredList = finalData.results.filter(m => m.overview && m.poster_path);
+
+                    if (filteredList.length === 0) {
+                        showError();
+                        return;
+                    }
+
+                    const randomIndex = Math.floor(Math.random() * filteredList.length);
+                    displayMovie(filteredList[randomIndex]);
+
+                } catch (err) {
+                    console.error("Erreur API TMDB :", err);
+                    showError();
+                } finally {
+                    matchBtn.disabled = false;
+                    matchBtn.textContent = "Sélectionner un film au hasard";
+                }
+            }
+
+            function displayMovie(movie) {
+                errorMsg.style.display = 'none';
+
+                movieTitle.textContent = movie.title;
+                movieOverview.textContent = movie.overview;
+                movieRating.textContent = `⭐ ${movie.vote_average.toFixed(1)}/10`;
+                movieYear.textContent = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
+                movieLang.textContent = langLabels[movie.original_language] || movie.original_language.toUpperCase();
+                
+                movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
+                movieImg.alt = `Affiche de ${movie.title}`;
+
+                resultContainer.style.display = 'block';
+                setTimeout(() => {
+                    resultContainer.classList.add('show');
+                }, 20);
+            }
+
+            function showError() {
+                resultContainer.classList.remove('show');
+                resultContainer.style.display = 'none';
+                errorMsg.style.display = 'block';
+            }
+
+            // Événement sur le bouton principal
+            matchBtn.addEventListener('click', fetchRandomMovie);
+        });
+    </script>
+</body>
+</html>
