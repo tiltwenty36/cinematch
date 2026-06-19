@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CinéMatch - Trouve ton film ce soir</title>
+    <title>CineMatch - Find Your Movie Tonight</title>
     
     <style>
         :root {
             --bg-color: #141414;
             --card-bg: #181818;
-            --accent-color: #E50914; 
+            --accent-color: #E50914; /* Netflix Red */
             --accent-hover: #B81D24;
             --text-color: #FFFFFF;
             --text-muted: #AAAAAA;
@@ -35,7 +35,7 @@
 
         .container {
             width: 100%;
-            max-width: 1000px; /* Élargi pour accueillir les nouveaux filtres harmonieusement */
+            max-width: 1000px;
             text-align: center;
         }
 
@@ -64,7 +64,6 @@
 
         .filters-grid {
             display: grid;
-            /* Grille responsive de 1 à 5 colonnes selon l'écran */
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
@@ -100,7 +99,6 @@
             border-color: var(--accent-color);
         }
 
-        /* Conteneur spécifique pour la fourchette de notes alignée */
         .rating-range-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -244,8 +242,8 @@
 
     <div class="container">
         <header>
-            <h1>CinéMatch</h1>
-            <p>Trouve ton film ce soir</p>
+            <h1>CineMatch</h1>
+            <p>Find Your Movie Tonight</p>
         </header>
 
         <section class="filters-section">
@@ -253,71 +251,71 @@
                 <div class="filter-group">
                     <label for="genre-select">Genre</label>
                     <select id="genre-select">
-                        <option value="all">Tous les genres</option>
+                        <option value="all">All Genres</option>
                         <option value="28">Action</option>
-                        <option value="35">Comédie</option>
-                        <option value="18">Drame</option>
-                        <option value="878">Science-Fiction</option>
-                        <option value="27">Horreur</option>
+                        <option value="35">Comedy</option>
+                        <option value="18">Drama</option>
+                        <option value="878">Sci-Fi</option>
+                        <option value="27">Horror</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="year-select">Année</label>
+                    <label for="year-select">Era</label>
                     <select id="year-select">
-                        <option value="all">Toutes les époques</option>
-                        <option value="50s">Années 50</option>
-                        <option value="60s">Années 60</option>
-                        <option value="70s">Années 70</option>
-                        <option value="80s">Années 80</option>
-                        <option value="90s">Années 90</option>
-                        <option value="2000s">Années 2000</option>
-                        <option value="2010s">Années 2010</option>
-                        <option value="recent">Récent (2020+)</option>
+                        <option value="all">All Eras</option>
+                        <option value="50s">50s</option>
+                        <option value="60s">60s</option>
+                        <option value="70s">70s</option>
+                        <option value="80s">80s</option>
+                        <option value="90s">90s</option>
+                        <option value="2000s">2000s</option>
+                        <option value="2010s">2010s</option>
+                        <option value="recent">Recent (2020+)</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="lang-select">Langue</label>
+                    <label for="lang-select">Original Language</label>
                     <select id="lang-select">
-                        <option value="all">Toutes les langues</option>
-                        <option value="fr">Français</option>
-                        <option value="en">Anglais</option>
-                        <option value="ja">Japonais</option>
-                        <option value="it">Italien</option>
-                        <option value="de">Allemand</option>
+                        <option value="all">All Languages</option>
+                        <option value="en">English</option>
+                        <option value="fr">French</option>
+                        <option value="ja">Japanese</option>
+                        <option value="it">Italian</option>
+                        <option value="de">German</option>
                         <option value="zh">Mandarin</option>
-                        <option value="pt">Portugais</option>
-                        <option value="ru">Russe</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="country-select">Pays d'origine</label>
+                    <label for="country-select">Country of Origin</label>
                     <select id="country-select">
-                        <option value="all">Tous les pays</option>
+                        <option value="all">All Countries</option>
+                        <option value="US">United States</option>
+                        <option value="GB">United Kingdom</option>
                         <option value="FR">France</option>
-                        <option value="BE">Belgique</option>
-                        <option value="CH">Suisse</option>
-                        <option value="GB">Royaume-Uni</option>
+                        <option value="BE">Belgium</option>
+                        <option value="CH">Switzerland</option>
                         <option value="PT">Portugal</option>
-                        <option value="IT">Italie</option>
-                        <option value="BR">Brésil</option>
-                        <option value="US">États-Unis</option>
-                        <option value="DE">Allemagne</option>
-                        <option value="CN">Chine</option>
+                        <option value="IT">Italy</option>
+                        <option value="BR">Brazil</option>
+                        <option value="DE">Germany</option>
+                        <option value="CN">China</option>
                         <option value="HK">Hong Kong</option>
-                        <option value="JP">Japon</option>
-                        <option value="TW">Taïwan</option>
-                        <option value="RU">Russie</option>
+                        <option value="JP">Japan</option>
+                        <option value="TW">Taiwan</option>
+                        <option value="RU">Russia</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Fourchette de Notes</label>
+                    <label>Rating Range</label>
                     <div class="rating-range-container">
                         <select id="rating-min-select">
-                            <option value="1">Min : 1</option>
+                            <option value="1">Min: 1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
@@ -328,7 +326,7 @@
                             <option value="9">9</option>
                         </select>
                         <select id="rating-max-select">
-                            <option value="10">Max : 10</option>
+                            <option value="10">Max: 10</option>
                             <option value="9">9</option>
                             <option value="8">8</option>
                             <option value="7">7</option>
@@ -342,24 +340,24 @@
                 </div>
             </div>
 
-            <button id="match-btn" class="btn-trigger">Sélectionner un film au hasard</button>
+            <button id="match-btn" class="btn-trigger">Roll a Random Movie</button>
         </section>
 
         <div id="error-msg" class="no-match-message">
-            Aucun film ne correspond à cette recherche ultra-précise, tentez une autre combinaison !
+            No movies match this criteria, try another combination!
         </div>
 
         <section id="result-container" class="result-section">
             <div class="movie-card">
-                <img id="movie-img" src="" alt="Affiche du film" class="movie-poster">
+                <img id="movie-img" src="" alt="Movie Poster" class="movie-poster">
                 <div class="movie-details">
-                    <h2 id="movie-title" class="movie-title">Titre du film</h2>
+                    <h2 id="movie-title" class="movie-title">Movie Title</h2>
                     <div class="movie-meta">
-                        <span id="movie-rating" class="badge badge-rating">Note</span>
-                        <span id="movie-year" class="badge">Année</span>
-                        <span id="movie-lang" class="badge">Langue</span>
+                        <span id="movie-rating" class="badge badge-rating">Rating</span>
+                        <span id="movie-year" class="badge">Year</span>
+                        <span id="movie-lang" class="badge">Language</span>
                     </div>
-                    <p id="movie-overview" class="movie-overview">Résumé du film...</p>
+                    <p id="movie-overview" class="movie-overview">Movie description summary...</p>
                 </div>
             </div>
         </section>
@@ -372,7 +370,7 @@
             const BASE_URL = "https://api.themoviedb.org/3";
             const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-            // Éléments du DOM
+            // DOM Elements
             const genreSelect = document.getElementById('genre-select');
             const yearSelect = document.getElementById('year-select');
             const langSelect = document.getElementById('lang-select');
@@ -391,40 +389,40 @@
             const movieRating = document.getElementById('movie-rating');
             const movieOverview = document.getElementById('movie-overview');
 
-            // Traduction des ISO de langues étendu
+            // English Labels map for dynamic Badges translation
             const langLabels = { 
-                'en': 'Anglais', 'fr': 'Français', 'ja': 'Japonais',
-                'it': 'Italien', 'de': 'Allemand', 'zh': 'Mandarin',
-                'pt': 'Portugais', 'ru': 'Russe'
+                'en': 'English', 'fr': 'French', 'ja': 'Japanese',
+                'it': 'Italian', 'de': 'German', 'zh': 'Mandarin',
+                'pt': 'Portuguese', 'ru': 'Russian'
             };
 
             async function fetchRandomMovie() {
                 matchBtn.disabled = true;
-                matchBtn.textContent = "Recherche en cours...";
+                matchBtn.textContent = "Rolling...";
 
-                // Base de la requête Discover (Tri par popularité, contenu fr, pas de contenu adulte)
-                let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=fr-FR&include_adult=false&sort_by=popularity.desc`;
+                // Switched base parameter query to language=en-US
+                let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=en-US&include_adult=false&sort_by=popularity.desc`;
 
-                // 1. Filtre Genre
+                // 1. Genre Query Append
                 if (genreSelect.value !== 'all') {
                     url += `&with_genres=${genreSelect.value}`;
                 }
 
-                // 2. Filtre Langue Originale
+                // 2. Original Language Query Append
                 if (langSelect.value !== 'all') {
                     url += `&with_original_language=${langSelect.value}`;
                 }
 
-                // 3. Filtre Pays d'origine
+                // 3. Country Query Append
                 if (countrySelect.value !== 'all') {
                     url += `&with_origin_country=${countrySelect.value}`;
                 }
 
-                // 4. Filtres Fourchette de Notes (gte = supérieur ou égal / lte = inférieur ou égal)
+                // 4. Rating Boundaries Query Append
                 url += `&vote_average.gte=${ratingMinSelect.value}`;
                 url += `&vote_average.lte=${ratingMaxSelect.value}`;
 
-                // 5. Filtre Année (Plages de dates par décennies)
+                // 5. Release Window Matrix (Decades configuration)
                 if (yearSelect.value !== 'all') {
                     if (yearSelect.value === '50s') url += `&primary_release_date.gte=1950-01-01&primary_release_date.lte=1959-12-31`;
                     if (yearSelect.value === '60s') url += `&primary_release_date.gte=1960-01-01&primary_release_date.lte=1969-12-31`;
@@ -445,14 +443,14 @@
                         return;
                     }
 
-                    // Sélection de page aléatoire intelligente (bloquée au top 10 des pages max)
+                    // Calculate safe maximum pages (Cap to page 10 for quality relevance assurance)
                     const maxPages = Math.min(data.total_pages, 10);
                     const randomPage = Math.floor(Math.random() * maxPages) + 1;
 
                     const finalResponse = await fetch(`${url}&page=${randomPage}`);
                     const finalData = await finalResponse.json();
 
-                    // Sécurisation : filtrage pour s'assurer d'avoir un résumé et un poster
+                    // Security check filtering: Requires an overview string and an explicit poster asset
                     const filteredList = finalData.results.filter(m => m.overview && m.poster_path);
 
                     if (filteredList.length === 0) {
@@ -464,11 +462,11 @@
                     displayMovie(filteredList[randomIndex]);
 
                 } catch (err) {
-                    console.error("Erreur API TMDB :", err);
+                    console.error("TMDB Api Error stream:", err);
                     showError();
                 } finally {
                     matchBtn.disabled = false;
-                    matchBtn.textContent = "Sélectionner un film au hasard";
+                    matchBtn.textContent = "Roll a Random Movie";
                 }
             }
 
@@ -482,7 +480,7 @@
                 movieLang.textContent = langLabels[movie.original_language] || movie.original_language.toUpperCase();
                 
                 movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
-                movieImg.alt = `Affiche de ${movie.title}`;
+                movieImg.alt = `${movie.title} Official Movie Poster`;
 
                 resultContainer.style.display = 'block';
                 setTimeout(() => {
@@ -496,7 +494,6 @@
                 errorMsg.style.display = 'block';
             }
 
-            // Événement sur le bouton principal
             matchBtn.addEventListener('click', fetchRandomMovie);
         });
     </script>
