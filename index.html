@@ -127,17 +127,17 @@
             transform: scale(0.98);
         }
 
-        /* Zone de résultat (Masquée par défaut, animée en JS) */
+        /* Zone de résultat (Masquée par défaut avec display:none) */
         .result-section {
             margin-top: 2rem;
-            display: none; /* Géré par le JS */
+            display: none; 
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
+        /* Classe ajoutée en JS pour déclencher l'affichage visuel complet */
         .result-section.show {
-            display: block;
             opacity: 1;
             transform: translateY(0);
         }
@@ -295,54 +295,111 @@
     </div>
 
     <script>
-        // 1. Base de données fictive (16 films variés)
-        const moviesDatabase = [
-            { id: 1, title: "Matrix", genre: "Science-Fiction", year: 1999, lang: "Anglais", overview: "Un hacker informatique apprend par de mystérieux rebelles la véritable nature de sa réalité et son rôle dans la guerre contre ses contrôleurs.", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60" },
-            { id: 2, title: "Inception", genre: "Science-Fiction", year: 2010, lang: "Anglais", overview: "Un voleur qui s'approprie les secrets d'entreprise à travers l'utilisation de la technologie de partage de rêves se voit confier la tâche inverse : implanter une idée dans l'esprit d'un C.E.O.", image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=60" },
-            { id: 3, title: "Le Fabuleux Destin d'Amélie Poulain", genre: "Comédie", year: 2001, lang: "Français", overview: "Amélie, une jeune serveuse innocente et naïve à Paris, décide d'aider les gens autour d'elle à trouver le bonheur, tout en luttant avec sa propre solitude.", image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=500&auto=format&fit=crop&q=60" },
-            { id: 4, title: "La Cité de la Peur", genre: "Comédie", year: 1994, lang: "Français", overview: "Une attachée de presse, un tueur en série, un policier maladroit et un acteur idiot se retrouvent à Cannes pour un film d'horreur qui devient réalité.", image: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60" },
-            { id: 5, title: "Interstellar", genre: "Science-Fiction", year: 2014, lang: "Anglais", overview: "Une équipe d'explorateurs voyage à travers un trou de ver dans l'espace naissant pour tenter de garantir la survie de l'humanité.", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&auto=format&fit=crop&q=60" },
-            { id: 6, title: "Parasite", genre: "Drame", year: 2019, lang: "Anglais", overview: "Toute la famille de Ki-taek est au chômage et s'intéresse fortement au train de vie de la richissime famille Park, jusqu'à ce qu'ils s'immiscent dans leur quotidien.", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&auto=format&fit=crop&q=60" },
-            { id: 7, title: "Conjuring", genre: "Horreur", year: 2013, lang: "Anglais", overview: "Les enquêteurs paranormaux Ed et Lorraine Warren viennent en aide à une famille terrorisée par une présence sombre dans leur ferme isolée.", image: "https://images.unsplash.com/photo-1505635552518-3448ff116af3?w=500&auto=format&fit=crop&q=60" },
-            { id: 8, title: "Anatomie d'une chute", genre: "Drame", year: 2023, lang: "Français", overview: "Une femme est suspectée du meurtre de son mari, retrouvé mort dans la neige, et le procès qui suit dissèque méthodiquement leur vie de couple tumultueuse.", image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=500&auto=format&fit=crop&q=60" },
-            { id: 9, title: "Bac Nord", genre: "Action", year: 2021, lang: "Français", overview: "Une brigade de police des quartiers Nord de Marseille tente d'améliorer ses résultats en franchissant parfois la ligne jaune dans une zone à haute tension.", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=60" },
-            { id: 10, title: "Get Out", genre: "Horreur", year: 2017, lang: "Anglais", overview: "Un jeune Afro-Américain rend visite à la famille de sa petite amie blanche pour le week-end, où son trouble face à leur accueil atteint un point de non-retour.", image: "https://images.unsplash.com/photo-1533928298208-27ff66555d8d?w=500&auto=format&fit=crop&q=60" },
-            { id: 11, title: "Dune: Deuxième Partie", genre: "Science-Fiction", year: 2024, lang: "Anglais", overview: "Paul Atreides s'unit à Chani et aux Fremen pour mener la révolte contre les conspirateurs qui ont détruit sa famille, tentant d'empêcher un futur terrible.", image: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500&auto=format&fit=crop&q=60" },
-            { id: 12, title: "Intouchables", genre: "Comédie", year: 2011, lang: "Français", overview: "À la suite d'un accident de parapente, un riche aristocrate engage comme aide à domicile un jeune de banlieue tout juste sorti de prison.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500&auto=format&fit=crop&q=60" },
-            { id: 13, title: "La Haine", genre: "Drame", year: 1995, lang: "Français", overview: "Une journée dans la vie de trois jeunes banlieusards le lendemain d'une nuit d'émeutes provoquée par une bavure policière.", image: "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=500&auto=format&fit=crop&q=60" },
-            { id: 14, title: "Mad Max: Fury Road", genre: "Action", year: 2015, lang: "Anglais", overview: "Dans un monde post-apocalyptique, une femme se rebelle contre un dirigeant tyrannique en cherchant sa patrie d'origine avec l'aide d'un groupe de prisonnières et d'un vagabond nommé Max.", image: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=500&auto=format&fit=crop&q=60" },
-            { id: 15, title: "Grave", genre: "Horreur", year: 2016, lang: "Français", overview: "Une étudiante végétarienne en école vétérinaire subit un bizutage qui l'oblige à manger de la viande crue, révélant chez elle une vraie nature insoupçonnée.", image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=60" },
-            { id: 16, title: "John Wick", genre: "Action", year: 2014, lang: "Anglais", overview: "Un ancien tueur à gages sort de sa retraite pour traquer les gangsters qui ont tué son chien, dernier cadeau de sa femme décédée.", image: "https://images.unsplash.com/photo-1601513525393-03938789d24c?w=500&auto=format&fit=crop&q=60" }
-        ];
+        // On attend que le DOM soit complètement chargé pour éviter les bugs d'éléments introuvables
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // 2. Ciblage des éléments HTML (DOM)
-        const genreSelect = document.getElementById('genre-select');
-        const yearSelect = document.getElementById('year-select');
-        const langSelect = document.getElementById('lang-select');
-        const matchBtn = document.getElementById('match-btn');
-        const resultContainer = document.getElementById('result-container');
-        const errorMsg = document.getElementById('error-msg');
+            // 1. Base de données fictive (16 films variés)
+            const moviesDatabase = [
+                { id: 1, title: "Matrix", genre: "Science-Fiction", year: 1999, lang: "Anglais", overview: "Un hacker informatique apprend par de mystérieux rebelles la véritable nature de sa réalité et son rôle dans la guerre contre ses contrôleurs.", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60" },
+                { id: 2, title: "Inception", genre: "Science-Fiction", year: 2010, lang: "Anglais", overview: "Un voleur qui s'approprie les secrets d'entreprise à travers l'utilisation de la technologie de partage de rêves se voit confier la tâche inverse : implanter une idée dans l'esprit d'un C.E.O.", image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=60" },
+                { id: 3, title: "Le Fabuleux Destin d'Amélie Poulain", genre: "Comédie", year: 2001, lang: "Français", overview: "Amélie, une jeune serveuse innocente et naïve à Paris, décide d'aider les gens autour d'elle à trouver le bonheur, tout en luttant avec sa propre solitude.", image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=500&auto=format&fit=crop&q=60" },
+                { id: 4, title: "La Cité de la Peur", genre: "Comédie", year: 1994, lang: "Français", overview: "Une attachée de presse, un tueur en série, un policier maladroit et un acteur idiot se retrouvent à Cannes pour un film d'horreur qui devient réalité.", image: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60" },
+                { id: 5, title: "Interstellar", genre: "Science-Fiction", year: 2014, lang: "Anglais", overview: "Une équipe d'explorateurs voyage à travers un trou de ver dans l'espace naissant pour tenter de garantir la survie de l'humanité.", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&auto=format&fit=crop&q=60" },
+                { id: 6, title: "Parasite", genre: "Drame", year: 2019, lang: "Anglais", overview: "Toute la famille de Ki-taek est au chômage et s'intéresse fortement au train de vie de la richissime famille Park, jusqu'à ce qu'ils s'immiscent dans leur quotidien.", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&auto=format&fit=crop&q=60" },
+                { id: 7, title: "Conjuring", genre: "Horreur", year: 2013, lang: "Anglais", overview: "Les enquêteurs paranormaux Ed et Lorraine Warren viennent en aide à une famille terrorisée par une présence sombre dans leur ferme isolée.", image: "https://images.unsplash.com/photo-1505635552518-3448ff116af3?w=500&auto=format&fit=crop&q=60" },
+                { id: 8, title: "Anatomie d'une chute", genre: "Drame", year: 2023, lang: "Français", overview: "Une femme est suspectée du meurtre de son mari, retrouvé mort dans la neige, et le procès qui suit dissèque méthodiquement leur vie de couple tumultueuse.", image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=500&auto=format&fit=crop&q=60" },
+                { id: 9, title: "Bac Nord", genre: "Action", year: 2021, lang: "Français", overview: "Une brigade de police des quartiers Nord de Marseille tente d'améliorer ses résultats en franchissant parfois la ligne jaune dans une zone à haute tension.", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=60" },
+                { id: 10, title: "Get Out", genre: "Horreur", year: 2017, lang: "Anglais", overview: "Un jeune Afro-Américain rend visite à la famille de sa petite amie blanche pour le week-end, où son trouble face à leur accueil atteint un point de non-retour.", image: "https://images.unsplash.com/photo-1533928298208-27ff66555d8d?w=500&auto=format&fit=crop&q=60" },
+                { id: 11, title: "Dune: Deuxième Partie", genre: "Science-Fiction", year: 2024, lang: "Anglais", overview: "Paul Atreides s'unit à Chani et aux Fremen pour mener la révolte contre les conspirateurs qui ont détruit sa famille, tentant d'empêcher un futur terrible.", image: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500&auto=format&fit=crop&q=60" },
+                { id: 12, title: "Intouchables", genre: "Comédie", year: 2011, lang: "Français", overview: "À la suite d'un accident de parapente, un riche aristocrate engage comme aide à domicile un jeune de banlieue tout juste sorti de prison.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500&auto=format&fit=crop&q=60" },
+                { id: 13, title: "La Haine", genre: "Drame", year: 1995, lang: "Français", overview: "Une journée dans la vie de trois jeunes banlieusards le lendemain d'une nuit d'émeutes provoquée par une bavure policière.", image: "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=500&auto=format&fit=crop&q=60" },
+                { id: 14, title: "Mad Max: Fury Road", genre: "Action", year: 2015, lang: "Anglais", overview: "Dans un monde post-apocalyptique, une femme se rebelle contre un dirigeant tyrannique en cherchant sa patrie d'origine avec l'aide d'un groupe de prisonnières et d'un vagabond nommé Max.", image: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=500&auto=format&fit=crop&q=60" },
+                { id: 15, title: "Grave", genre: "Horreur", year: 2016, lang: "Français", overview: "Une étudiante végétarienne en école vétérinaire subit un bizutage qui l'oblige à manger de la viande crue, révélant chez elle une vraie nature insoupçonnée.", image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=60" },
+                { id: 16, title: "John Wick", genre: "Action", year: 2014, lang: "Anglais", overview: "Un ancien tueur à gages sort de sa retraite pour traquant les gangsters qui ont tué son chien, dernier cadeau de sa femme décédée.", image: "https://images.unsplash.com/photo-1601513525393-03938789d24c?w=500&auto=format&fit=crop&q=60" }
+            ];
 
-        const movieImg = document.getElementById('movie-img');
-        const movieTitle = document.getElementById('movie-title');
-        const movieGenre = document.getElementById('movie-genre');
-        const movieYear = document.getElementById('movie-year');
-        const movieLang = document.getElementById('movie-lang');
-        const movieOverview = document.getElementById('movie-overview');
+            // 2. Ciblage des éléments HTML (DOM)
+            const genreSelect = document.getElementById('genre-select');
+            const yearSelect = document.getElementById('year-select');
+            const langSelect = document.getElementById('lang-select');
+            const matchBtn = document.getElementById('match-btn');
+            const resultContainer = document.getElementById('result-container');
+            const errorMsg = document.getElementById('error-msg');
 
-        // 3. Fonction pour vérifier si l'année du film correspond à la tranche sélectionnée
-        function checkYearRange(movieYear, selectValue) {
-            if (selectValue === 'all') return true;
-            if (selectValue === '90s') return movieYear >= 1990 && movieYear <= 1999;
-            if (selectValue === '2000s') return movieYear >= 2000 && movieYear <= 2009;
-            if (selectValue === '2010s') return movieYear >= 2010 && movieYear <= 2019;
-            if (selectValue === 'recent') return movieYear >= 2020;
-            return false;
-        }
+            const movieImg = document.getElementById('movie-img');
+            const movieTitle = document.getElementById('movie-title');
+            const movieGenre = document.getElementById('movie-genre');
+            const movieYear = document.getElementById('movie-year');
+            const movieLang = document.getElementById('movie-lang');
+            const movieOverview = document.getElementById('movie-overview');
 
-        // 4. Fonction principale : Sélectionner et afficher le film
-        function findMovie() {
-            // Récupération des filtres choisis par l'utilisateur
-            const selectedGenre = genreSelect.value;
-            const selectedYearRange = yearSelect.value;
-            const selectedLang =
+            // 3. Fonction utilitaire pour trier les tranches d'années
+            function checkYearRange(movieYear, selectValue) {
+                if (selectValue === 'all') return true;
+                if (selectValue === '90s') return movieYear >= 1990 && movieYear <= 1999;
+                if (selectValue === '2000s') return movieYear >= 2000 && movieYear <= 2009;
+                if (selectValue === '2010s') return movieYear >= 2010 && movieYear <= 2019;
+                if (selectValue === 'recent') return movieYear >= 2020;
+                return false;
+            }
+
+            // 4. Fonction principale déclenchée au clic
+            function findMovie() {
+                // Récupération immédiate des valeurs choisies
+                const selectedGenre = genreSelect.value;
+                const selectedYearRange = yearSelect.value;
+                const selectedLang = langSelect.value;
+
+                // Filtrage de la BDD
+                const filteredMovies = moviesDatabase.filter(movie => {
+                    const matchGenre = (selectedGenre === 'all' || movie.genre === selectedGenre);
+                    const matchLang = (selectedLang === 'all' || movie.lang === selectedLang);
+                    const matchYear = checkYearRange(movie.year, selectedYearRange);
+                    
+                    return matchGenre && matchLang && matchYear;
+                });
+
+                // Si aucun film trouvé : on cache le résultat actuel et on affiche l'erreur
+                if (filteredMovies.length === 0) {
+                    resultContainer.classList.remove('show');
+                    resultContainer.style.display = 'none';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                // Si on trouve un film : on cache le message d'erreur
+                errorMsg.style.display = 'none';
+
+                // Choix aléatoire
+                const randomIndex = Math.floor(Math.random() * filteredMovies.length);
+                const chosenMovie = filteredMovies[randomIndex];
+
+                // Injection dynamique des informations dans les balises HTML
+                movieTitle.textContent = chosenMovie.title;
+                movieGenre.textContent = chosenMovie.genre;
+                movieYear.textContent = chosenMovie.year;
+                movieLang.textContent = chosenMovie.lang;
+                movieOverview.textContent = chosenMovie.overview;
+                movieImg.src = chosenMovie.image;
+                movieImg.alt = `Affiche de ${chosenMovie.title}`;
+
+                // Affichage visuel propre avec animation CSS
+                resultContainer.style.display = 'block';
+                
+                // Petit délai asynchrone pour forcer le navigateur à traiter le display:block 
+                // avant de lancer l'animation de transition (opacité et mouvement)
+                setTimeout(() => {
+                    resultContainer.classList.add('show');
+                }, 20);
+            }
+
+            // 5. Ajout de l'écouteur d'événement de clic sécurisé sur le bouton
+            if (matchBtn) {
+                matchBtn.addEventListener('click', findMovie);
+            } else {
+                console.error("Le bouton 'match-btn' n'a pas pu être trouvé dans le DOM.");
+            }
+        });
+    </script>
+</body>
+</html>
