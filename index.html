@@ -35,7 +35,7 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px; /* Légèrement élargi pour accueillir les 4 filtres proprement */
             text-align: center;
         }
 
@@ -64,7 +64,8 @@
 
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            /* Grille adaptative qui passe de 1 à 4 colonnes selon la taille de l'écran */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -258,6 +259,10 @@
                     <label for="year-select">Année</label>
                     <select id="year-select">
                         <option value="all">Toutes les époques</option>
+                        <option value="50s">Années 50</option>
+                        <option value="60s">Années 60</option>
+                        <option value="70s">Années 70</option>
+                        <option value="80s">Années 80</option>
                         <option value="90s">Années 90</option>
                         <option value="2000s">Années 2000</option>
                         <option value="2010s">Années 2010</option>
@@ -271,6 +276,22 @@
                         <option value="all">Toutes les langues</option>
                         <option value="fr">Français</option>
                         <option value="en">Anglais</option>
+                        <option value="ja">Japonais</option>
+                        <option value="it">Italien</option>
+                        <option value="de">Allemand</option>
+                        <option value="zh">Mandarin</option>
+                        <option value="pt">Portugais</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="rating-select">Note minimale</label>
+                    <select id="rating-select">
+                        <option value="all">Toutes les notes</option>
+                        <option value="5">Étoiles montantes (> 5/10)</option>
+                        <option value="6">Bons films (> 6/10)</option>
+                        <option value="7">Excellents films (> 7/10)</option>
+                        <option value="8">Chefs-d'œuvre (> 8/10)</option>
                     </select>
                 </div>
             </div>
@@ -301,15 +322,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Constantes de configuration TMDB avec ta clé injectée
             const TMDB_API_KEY = "a22cc070653d990b7947884e821738de";
             const BASE_URL = "https://api.themoviedb.org/3";
             const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-            // Sélections des éléments de l'interface
+            // Éléments du DOM
             const genreSelect = document.getElementById('genre-select');
             const yearSelect = document.getElementById('year-select');
             const langSelect = document.getElementById('lang-select');
+            const ratingSelect = document.getElementById('rating-select');
             const matchBtn = document.getElementById('match-btn');
             const resultContainer = document.getElementById('result-container');
             const errorMsg = document.getElementById('error-msg');
@@ -321,30 +342,45 @@
             const movieRating = document.getElementById('movie-rating');
             const movieOverview = document.getElementById('movie-overview');
 
-            // Traduction des ISO de langue pour l'affichage des badges
-            const langLabels = { 'en': 'Anglais', 'fr': 'Français' };
+            // Traduction des ISO pour l'affichage final
+            const langLabels = { 
+                'en': 'Anglais', 
+                'fr': 'Français',
+                'ja': 'Japonais',
+                'it': 'Italien',
+                'de': 'Allemand',
+                'zh': 'Mandarin',
+                'pt': 'Portugais'
+            };
 
-            // Fonction asynchrone connectée à l'API de découverte
             async function fetchRandomMovie() {
-                // UI feedback : désactive le bouton pour éviter le spam de clics
                 matchBtn.disabled = true;
                 matchBtn.textContent = "Recherche en cours...";
 
-                // Initialisation de la requête Discover en français, excluant le contenu adulte
+                // Base de l'URL Discover
                 let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=fr-FR&include_adult=false&sort_by=popularity.desc`;
 
-                // Injection du filtre Genre
+                // 1. Filtre Genre
                 if (genreSelect.value !== 'all') {
                     url += `&with_genres=${genreSelect.value}`;
                 }
 
-                // Injection du filtre Langue
+                // 2. Filtre Langue
                 if (langSelect.value !== 'all') {
                     url += `&with_original_language=${langSelect.value}`;
                 }
 
-                // Injection du filtre Année via les paramètres de date de sortie de TMDB
+                // 3. Filtre Note Minimale
+                if (ratingSelect.value !== 'all') {
+                    url += `&vote_average.gte=${ratingSelect.value}`;
+                }
+
+                // 4. Filtre Année (Mapping par décennies)
                 if (yearSelect.value !== 'all') {
+                    if (yearSelect.value === '50s') url += `&primary_release_date.gte=1950-01-01&primary_release_date.lte=1959-12-31`;
+                    if (yearSelect.value === '60s') url += `&primary_release_date.gte=1960-01-01&primary_release_date.lte=1969-12-31`;
+                    if (yearSelect.value === '70s') url += `&primary_release_date.gte=1970-01-01&primary_release_date.lte=1979-12-31`;
+                    if (yearSelect.value === '80s') url += `&primary_release_date.gte=1980-01-01&primary_release_date.lte=1989-12-31`;
                     if (yearSelect.value === '90s') url += `&primary_release_date.gte=1990-01-01&primary_release_date.lte=1999-12-31`;
                     if (yearSelect.value === '2000s') url += `&primary_release_date.gte=2000-01-01&primary_release_date.lte=2009-12-31`;
                     if (yearSelect.value === '2010s') url += `&primary_release_date.gte=2010-01-01&primary_release_date.lte=2019-12-31`;
@@ -352,7 +388,6 @@
                 }
 
                 try {
-                    // Étape 1 : Obtenir le volume global de résultats pour la pagination
                     const response = await fetch(url);
                     const data = await response.json();
 
@@ -361,15 +396,14 @@
                         return;
                     }
 
-                    // Étape 2 : Choisir une page au hasard (limité au top 10 des pages pour garder des films qualitatifs)
+                    // Sélection d'une page aléatoire (Top 10 maximum pour assurer la qualité)
                     const maxPages = Math.min(data.total_pages, 10);
                     const randomPage = Math.floor(Math.random() * maxPages) + 1;
 
-                    // Étape 3 : Lancer la requête finale sur la page aléatoire déterminée
                     const finalResponse = await fetch(`${url}&page=${randomPage}`);
                     const finalData = await finalResponse.json();
 
-                    // Étape 4 : Filtrer pour s'assurer que le film possède bien un résumé et un poster valide
+                    // Nettoyage de la liste : requiert un résumé et une affiche valide
                     const filteredList = finalData.results.filter(m => m.overview && m.poster_path);
 
                     if (filteredList.length === 0) {
@@ -377,7 +411,6 @@
                         return;
                     }
 
-                    // Étape 5 : Sélectionner un index aléatoire dans la liste finale filtrée
                     const randomIndex = Math.floor(Math.random() * filteredList.length);
                     displayMovie(filteredList[randomIndex]);
 
@@ -385,13 +418,11 @@
                     console.error("Erreur API TMDB :", err);
                     showError();
                 } finally {
-                    // Rétablissement de l'état du bouton
                     matchBtn.disabled = false;
                     matchBtn.textContent = "Sélectionner un film au hasard";
                 }
             }
 
-            // Met à jour l'interface avec les données structurées reçues de TMDB
             function displayMovie(movie) {
                 errorMsg.style.display = 'none';
 
@@ -401,25 +432,21 @@
                 movieYear.textContent = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
                 movieLang.textContent = langLabels[movie.original_language] || movie.original_language.toUpperCase();
                 
-                // Concaténation de l'URL absolue pour l'affiche officielle
                 movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
-                movieImg.alt = `Affiche officielle de ${movie.title}`;
+                movieImg.alt = `Affiche de ${movie.title}`;
 
-                // Déclenchement de l'animation de transition asynchrone
                 resultContainer.style.display = 'block';
                 setTimeout(() => {
                     resultContainer.classList.add('show');
                 }, 20);
             }
 
-            // Gestion de l'affichage en cas de retour vide
             function showError() {
                 resultContainer.classList.remove('show');
                 resultContainer.style.display = 'none';
                 errorMsg.style.display = 'block';
             }
 
-            // Écouteur d'événement principal
             matchBtn.addEventListener('click', fetchRandomMovie);
         });
     </script>
