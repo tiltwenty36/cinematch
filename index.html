@@ -6,18 +6,16 @@
     <title>CinéMatch - Trouve ton film ce soir</title>
     
     <style>
-        /* Variables globales pour maintenir une cohérence dans les couleurs */
         :root {
             --bg-color: #141414;
             --card-bg: #181818;
-            --accent-color: #E50914; /* Rouge Netflix */
+            --accent-color: #E50914; 
             --accent-hover: #B81D24;
             --text-color: #FFFFFF;
             --text-muted: #AAAAAA;
             --border-color: #333333;
         }
 
-        /* Réinitialisation de base et typographie */
         * {
             margin: 0;
             padding: 0;
@@ -35,14 +33,12 @@
             padding: 2rem 1rem;
         }
 
-        /* Conteneur principal */
         .container {
             width: 100%;
             max-width: 800px;
             text-align: center;
         }
 
-        /* En-tête */
         header h1 {
             font-size: 2.5rem;
             color: var(--accent-color);
@@ -58,7 +54,6 @@
             font-size: 1.1rem;
         }
 
-        /* Section des Filtres */
         .filters-section {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -104,7 +99,6 @@
             border-color: var(--accent-color);
         }
 
-        /* Gros Bouton Central */
         .btn-trigger {
             background-color: var(--accent-color);
             color: var(--text-color);
@@ -127,7 +121,11 @@
             transform: scale(0.98);
         }
 
-        /* Zone de résultat (Masquée par défaut avec display:none) */
+        .btn-trigger:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
         .result-section {
             margin-top: 2rem;
             display: none; 
@@ -136,13 +134,11 @@
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        /* Classe ajoutée en JS pour déclencher l'affichage visuel complet */
         .result-section.show {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Carte du film */
         .movie-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -156,8 +152,9 @@
 
         .movie-poster {
             width: 100%;
-            height: 350px;
+            height: 400px;
             object-fit: cover;
+            background-color: #222;
         }
 
         .movie-details {
@@ -170,7 +167,6 @@
             font-weight: 700;
         }
 
-        /* Badges pour les métadonnées (Genre, Année, etc.) */
         .movie-meta {
             display: flex;
             flex-wrap: wrap;
@@ -192,25 +188,32 @@
             color: var(--accent-color);
         }
 
+        .badge-rating {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
         .movie-overview {
             color: var(--text-muted);
             line-height: 1.6;
             font-size: 1rem;
         }
 
-        /* Message d'erreur si aucun film ne correspond */
         .no-match-message {
-            color: var(--accent-color);
+            color: #ffc107;
             font-weight: 600;
             margin-top: 2rem;
             display: none;
+            background-color: rgba(255, 193, 7, 0.1);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 193, 7, 0.2);
         }
 
-        /* Responsive : Design adapté pour les tablettes et ordinateurs */
         @media (min-width: 600px) {
             .movie-card {
                 flex-direction: row;
-                height: 400px;
+                height: 450px;
             }
 
             .movie-poster {
@@ -224,6 +227,7 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
+                overflow-y: auto;
             }
         }
     </style>
@@ -242,11 +246,11 @@
                     <label for="genre-select">Genre</label>
                     <select id="genre-select">
                         <option value="all">Tous les genres</option>
-                        <option value="Action">Action</option>
-                        <option value="Comédie">Comédie</option>
-                        <option value="Drame">Drame</option>
-                        <option value="Science-Fiction">Science-Fiction</option>
-                        <option value="Horreur">Horreur</option>
+                        <option value="28">Action</option>
+                        <option value="35">Comédie</option>
+                        <option value="18">Drame</option>
+                        <option value="878">Science-Fiction</option>
+                        <option value="27">Horreur</option>
                     </select>
                 </div>
 
@@ -265,8 +269,8 @@
                     <label for="lang-select">Langue</label>
                     <select id="lang-select">
                         <option value="all">Toutes les langues</option>
-                        <option value="Français">Français</option>
-                        <option value="Anglais">Anglais</option>
+                        <option value="fr">Français</option>
+                        <option value="en">Anglais</option>
                     </select>
                 </div>
             </div>
@@ -275,7 +279,7 @@
         </section>
 
         <div id="error-msg" class="no-match-message">
-            Aucun film ne correspond à ces critères. Modifie tes filtres et réessaie !
+            Aucun film ne correspond à cette recherche ultra-précise, tentez une autre combinaison !
         </div>
 
         <section id="result-container" class="result-section">
@@ -284,7 +288,7 @@
                 <div class="movie-details">
                     <h2 id="movie-title" class="movie-title">Titre du film</h2>
                     <div class="movie-meta">
-                        <span id="movie-genre" class="badge badge-accent">Genre</span>
+                        <span id="movie-rating" class="badge badge-rating">Note</span>
                         <span id="movie-year" class="badge">Année</span>
                         <span id="movie-lang" class="badge">Langue</span>
                     </div>
@@ -295,30 +299,14 @@
     </div>
 
     <script>
-        // On attend que le DOM soit complètement chargé pour éviter les bugs d'éléments introuvables
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // Constantes de configuration TMDB avec ta clé injectée
+            const TMDB_API_KEY = "a22cc070653d990b7947884e821738de";
+            const BASE_URL = "https://api.themoviedb.org/3";
+            const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-            // 1. Base de données fictive (16 films variés)
-            const moviesDatabase = [
-                { id: 1, title: "Matrix", genre: "Science-Fiction", year: 1999, lang: "Anglais", overview: "Un hacker informatique apprend par de mystérieux rebelles la véritable nature de sa réalité et son rôle dans la guerre contre ses contrôleurs.", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60" },
-                { id: 2, title: "Inception", genre: "Science-Fiction", year: 2010, lang: "Anglais", overview: "Un voleur qui s'approprie les secrets d'entreprise à travers l'utilisation de la technologie de partage de rêves se voit confier la tâche inverse : implanter une idée dans l'esprit d'un C.E.O.", image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=60" },
-                { id: 3, title: "Le Fabuleux Destin d'Amélie Poulain", genre: "Comédie", year: 2001, lang: "Français", overview: "Amélie, une jeune serveuse innocente et naïve à Paris, décide d'aider les gens autour d'elle à trouver le bonheur, tout en luttant avec sa propre solitude.", image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=500&auto=format&fit=crop&q=60" },
-                { id: 4, title: "La Cité de la Peur", genre: "Comédie", year: 1994, lang: "Français", overview: "Une attachée de presse, un tueur en série, un policier maladroit et un acteur idiot se retrouvent à Cannes pour un film d'horreur qui devient réalité.", image: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60" },
-                { id: 5, title: "Interstellar", genre: "Science-Fiction", year: 2014, lang: "Anglais", overview: "Une équipe d'explorateurs voyage à travers un trou de ver dans l'espace naissant pour tenter de garantir la survie de l'humanité.", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&auto=format&fit=crop&q=60" },
-                { id: 6, title: "Parasite", genre: "Drame", year: 2019, lang: "Anglais", overview: "Toute la famille de Ki-taek est au chômage et s'intéresse fortement au train de vie de la richissime famille Park, jusqu'à ce qu'ils s'immiscent dans leur quotidien.", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&auto=format&fit=crop&q=60" },
-                { id: 7, title: "Conjuring", genre: "Horreur", year: 2013, lang: "Anglais", overview: "Les enquêteurs paranormaux Ed et Lorraine Warren viennent en aide à une famille terrorisée par une présence sombre dans leur ferme isolée.", image: "https://images.unsplash.com/photo-1505635552518-3448ff116af3?w=500&auto=format&fit=crop&q=60" },
-                { id: 8, title: "Anatomie d'une chute", genre: "Drame", year: 2023, lang: "Français", overview: "Une femme est suspectée du meurtre de son mari, retrouvé mort dans la neige, et le procès qui suit dissèque méthodiquement leur vie de couple tumultueuse.", image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=500&auto=format&fit=crop&q=60" },
-                { id: 9, title: "Bac Nord", genre: "Action", year: 2021, lang: "Français", overview: "Une brigade de police des quartiers Nord de Marseille tente d'améliorer ses résultats en franchissant parfois la ligne jaune dans une zone à haute tension.", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=60" },
-                { id: 10, title: "Get Out", genre: "Horreur", year: 2017, lang: "Anglais", overview: "Un jeune Afro-Américain rend visite à la famille de sa petite amie blanche pour le week-end, où son trouble face à leur accueil atteint un point de non-retour.", image: "https://images.unsplash.com/photo-1533928298208-27ff66555d8d?w=500&auto=format&fit=crop&q=60" },
-                { id: 11, title: "Dune: Deuxième Partie", genre: "Science-Fiction", year: 2024, lang: "Anglais", overview: "Paul Atreides s'unit à Chani et aux Fremen pour mener la révolte contre les conspirateurs qui ont détruit sa famille, tentant d'empêcher un futur terrible.", image: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500&auto=format&fit=crop&q=60" },
-                { id: 12, title: "Intouchables", genre: "Comédie", year: 2011, lang: "Français", overview: "À la suite d'un accident de parapente, un riche aristocrate engage comme aide à domicile un jeune de banlieue tout juste sorti de prison.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500&auto=format&fit=crop&q=60" },
-                { id: 13, title: "La Haine", genre: "Drame", year: 1995, lang: "Français", overview: "Une journée dans la vie de trois jeunes banlieusards le lendemain d'une nuit d'émeutes provoquée par une bavure policière.", image: "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=500&auto=format&fit=crop&q=60" },
-                { id: 14, title: "Mad Max: Fury Road", genre: "Action", year: 2015, lang: "Anglais", overview: "Dans un monde post-apocalyptique, une femme se rebelle contre un dirigeant tyrannique en cherchant sa patrie d'origine avec l'aide d'un groupe de prisonnières et d'un vagabond nommé Max.", image: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=500&auto=format&fit=crop&q=60" },
-                { id: 15, title: "Grave", genre: "Horreur", year: 2016, lang: "Français", overview: "Une étudiante végétarienne en école vétérinaire subit un bizutage qui l'oblige à manger de la viande crue, révélant chez elle une vraie nature insoupçonnée.", image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=60" },
-                { id: 16, title: "John Wick", genre: "Action", year: 2014, lang: "Anglais", overview: "Un ancien tueur à gages sort de sa retraite pour traquant les gangsters qui ont tué son chien, dernier cadeau de sa femme décédée.", image: "https://images.unsplash.com/photo-1601513525393-03938789d24c?w=500&auto=format&fit=crop&q=60" }
-            ];
-
-            // 2. Ciblage des éléments HTML (DOM)
+            // Sélections des éléments de l'interface
             const genreSelect = document.getElementById('genre-select');
             const yearSelect = document.getElementById('year-select');
             const langSelect = document.getElementById('lang-select');
@@ -328,77 +316,111 @@
 
             const movieImg = document.getElementById('movie-img');
             const movieTitle = document.getElementById('movie-title');
-            const movieGenre = document.getElementById('movie-genre');
             const movieYear = document.getElementById('movie-year');
             const movieLang = document.getElementById('movie-lang');
+            const movieRating = document.getElementById('movie-rating');
             const movieOverview = document.getElementById('movie-overview');
 
-            // 3. Fonction utilitaire pour trier les tranches d'années
-            function checkYearRange(movieYear, selectValue) {
-                if (selectValue === 'all') return true;
-                if (selectValue === '90s') return movieYear >= 1990 && movieYear <= 1999;
-                if (selectValue === '2000s') return movieYear >= 2000 && movieYear <= 2009;
-                if (selectValue === '2010s') return movieYear >= 2010 && movieYear <= 2019;
-                if (selectValue === 'recent') return movieYear >= 2020;
-                return false;
-            }
+            // Traduction des ISO de langue pour l'affichage des badges
+            const langLabels = { 'en': 'Anglais', 'fr': 'Français' };
 
-            // 4. Fonction principale déclenchée au clic
-            function findMovie() {
-                // Récupération immédiate des valeurs choisies
-                const selectedGenre = genreSelect.value;
-                const selectedYearRange = yearSelect.value;
-                const selectedLang = langSelect.value;
+            // Fonction asynchrone connectée à l'API de découverte
+            async function fetchRandomMovie() {
+                // UI feedback : désactive le bouton pour éviter le spam de clics
+                matchBtn.disabled = true;
+                matchBtn.textContent = "Recherche en cours...";
 
-                // Filtrage de la BDD
-                const filteredMovies = moviesDatabase.filter(movie => {
-                    const matchGenre = (selectedGenre === 'all' || movie.genre === selectedGenre);
-                    const matchLang = (selectedLang === 'all' || movie.lang === selectedLang);
-                    const matchYear = checkYearRange(movie.year, selectedYearRange);
-                    
-                    return matchGenre && matchLang && matchYear;
-                });
+                // Initialisation de la requête Discover en français, excluant le contenu adulte
+                let url = `${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=fr-FR&include_adult=false&sort_by=popularity.desc`;
 
-                // Si aucun film trouvé : on cache le résultat actuel et on affiche l'erreur
-                if (filteredMovies.length === 0) {
-                    resultContainer.classList.remove('show');
-                    resultContainer.style.display = 'none';
-                    errorMsg.style.display = 'block';
-                    return;
+                // Injection du filtre Genre
+                if (genreSelect.value !== 'all') {
+                    url += `&with_genres=${genreSelect.value}`;
                 }
 
-                // Si on trouve un film : on cache le message d'erreur
+                // Injection du filtre Langue
+                if (langSelect.value !== 'all') {
+                    url += `&with_original_language=${langSelect.value}`;
+                }
+
+                // Injection du filtre Année via les paramètres de date de sortie de TMDB
+                if (yearSelect.value !== 'all') {
+                    if (yearSelect.value === '90s') url += `&primary_release_date.gte=1990-01-01&primary_release_date.lte=1999-12-31`;
+                    if (yearSelect.value === '2000s') url += `&primary_release_date.gte=2000-01-01&primary_release_date.lte=2009-12-31`;
+                    if (yearSelect.value === '2010s') url += `&primary_release_date.gte=2010-01-01&primary_release_date.lte=2019-12-31`;
+                    if (yearSelect.value === 'recent') url += `&primary_release_date.gte=2020-01-01`;
+                }
+
+                try {
+                    // Étape 1 : Obtenir le volume global de résultats pour la pagination
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!data.results || data.results.length === 0) {
+                        showError();
+                        return;
+                    }
+
+                    // Étape 2 : Choisir une page au hasard (limité au top 10 des pages pour garder des films qualitatifs)
+                    const maxPages = Math.min(data.total_pages, 10);
+                    const randomPage = Math.floor(Math.random() * maxPages) + 1;
+
+                    // Étape 3 : Lancer la requête finale sur la page aléatoire déterminée
+                    const finalResponse = await fetch(`${url}&page=${randomPage}`);
+                    const finalData = await finalResponse.json();
+
+                    // Étape 4 : Filtrer pour s'assurer que le film possède bien un résumé et un poster valide
+                    const filteredList = finalData.results.filter(m => m.overview && m.poster_path);
+
+                    if (filteredList.length === 0) {
+                        showError();
+                        return;
+                    }
+
+                    // Étape 5 : Sélectionner un index aléatoire dans la liste finale filtrée
+                    const randomIndex = Math.floor(Math.random() * filteredList.length);
+                    displayMovie(filteredList[randomIndex]);
+
+                } catch (err) {
+                    console.error("Erreur API TMDB :", err);
+                    showError();
+                } finally {
+                    // Rétablissement de l'état du bouton
+                    matchBtn.disabled = false;
+                    matchBtn.textContent = "Sélectionner un film au hasard";
+                }
+            }
+
+            // Met à jour l'interface avec les données structurées reçues de TMDB
+            function displayMovie(movie) {
                 errorMsg.style.display = 'none';
 
-                // Choix aléatoire
-                const randomIndex = Math.floor(Math.random() * filteredMovies.length);
-                const chosenMovie = filteredMovies[randomIndex];
-
-                // Injection dynamique des informations dans les balises HTML
-                movieTitle.textContent = chosenMovie.title;
-                movieGenre.textContent = chosenMovie.genre;
-                movieYear.textContent = chosenMovie.year;
-                movieLang.textContent = chosenMovie.lang;
-                movieOverview.textContent = chosenMovie.overview;
-                movieImg.src = chosenMovie.image;
-                movieImg.alt = `Affiche de ${chosenMovie.title}`;
-
-                // Affichage visuel propre avec animation CSS
-                resultContainer.style.display = 'block';
+                movieTitle.textContent = movie.title;
+                movieOverview.textContent = movie.overview;
+                movieRating.textContent = `⭐ ${movie.vote_average.toFixed(1)}/10`;
+                movieYear.textContent = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A';
+                movieLang.textContent = langLabels[movie.original_language] || movie.original_language.toUpperCase();
                 
-                // Petit délai asynchrone pour forcer le navigateur à traiter le display:block 
-                // avant de lancer l'animation de transition (opacité et mouvement)
+                // Concaténation de l'URL absolue pour l'affiche officielle
+                movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
+                movieImg.alt = `Affiche officielle de ${movie.title}`;
+
+                // Déclenchement de l'animation de transition asynchrone
+                resultContainer.style.display = 'block';
                 setTimeout(() => {
                     resultContainer.classList.add('show');
                 }, 20);
             }
 
-            // 5. Ajout de l'écouteur d'événement de clic sécurisé sur le bouton
-            if (matchBtn) {
-                matchBtn.addEventListener('click', findMovie);
-            } else {
-                console.error("Le bouton 'match-btn' n'a pas pu être trouvé dans le DOM.");
+            // Gestion de l'affichage en cas de retour vide
+            function showError() {
+                resultContainer.classList.remove('show');
+                resultContainer.style.display = 'none';
+                errorMsg.style.display = 'block';
             }
+
+            // Écouteur d'événement principal
+            matchBtn.addEventListener('click', fetchRandomMovie);
         });
     </script>
 </body>
