@@ -181,8 +181,52 @@
         }
 
         .movie-director-runtime span {
-            color: var(--accent-color);
+            color: var(--text-color);
             font-weight: 600;
+        }
+
+        /* ==========================================
+           WHERE TO WATCH COMPONENT STYLES
+           ========================================== */
+        .providers-container {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .providers-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .providers-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .provider-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .provider-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .provider-empty {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
         }
 
         .movie-meta {
@@ -260,9 +304,6 @@
             border: 1px solid rgba(255, 193, 7, 0.2);
         }
 
-        /* ==========================================
-           WATCHLIST COMPONENT STYLES
-           ========================================== --> */
         .watchlist-section {
             margin-top: 4rem;
             border-top: 1px solid var(--border-color);
@@ -348,7 +389,7 @@
         @media (min-width: 600px) {
             .movie-card {
                 flex-direction: row;
-                height: 450px;
+                height: 480px; /* Expanded slightly to offset provider tray padding safely */
             }
 
             .movie-poster {
@@ -428,7 +469,7 @@
                         <option value="FR">France</option>
                         <option value="BE">Belgium</option>
                         <option value="CH">Switzerland</option>
-                        <option value="PT">Portuguese</option>
+                        <option value="PT">Portugal</option>
                         <option value="IT">Italy</option>
                         <option value="BR">Brazil</option>
                         <option value="DE">Germany</option>
@@ -484,6 +525,13 @@
                     <div class="movie-director-runtime">
                         Director: <span id="movie-director">Unknown</span> | Runtime: <span id="movie-runtime">N/A</span>
                     </div>
+
+                    <div class="providers-container">
+                        <div class="providers-title">Where to Watch:</div>
+                        <div id="movie-providers" class="providers-list">
+                            </div>
+                    </div>
+
                     <div class="movie-meta">
                         <span id="movie-rating" class="badge badge-rating">Rating</span>
                         <span id="movie-year" class="badge">Year</span>
@@ -513,11 +561,11 @@
             const TMDB_API_KEY = "a22cc070653d990b7947884e821738de";
             const BASE_URL = "https://api.themoviedb.org/3";
             const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+            const PROVIDER_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
 
-            // State Tracking Variable for the currently targeted movie selection
             let currentMovie = null;
 
-            // DOM Reference Elements
+            // DOM Query Locators
             const genreSelect = document.getElementById('genre-select');
             const yearSelect = document.getElementById('year-select');
             const langSelect = document.getElementById('lang-select');
@@ -536,6 +584,7 @@
             const movieTitle = document.getElementById('movie-title');
             const movieDirector = document.getElementById('movie-director');
             const movieRuntime = document.getElementById('movie-runtime');
+            const movieProviders = document.getElementById('movie-providers');
             const movieYear = document.getElementById('movie-year');
             const movieLang = document.getElementById('movie-lang');
             const movieRating = document.getElementById('movie-rating');
@@ -547,7 +596,6 @@
                 'pt': 'Portuguese', 'ru': 'Russian'
             };
 
-            // Initialize app lifecycle execution maps
             renderWatchlist();
 
             async function fetchRandomMovie() {
@@ -599,14 +647,17 @@
                     const randomIndex = Math.floor(Math.random() * filteredList.length);
                     const chosenMovie = filteredList[randomIndex];
 
-                    // Combined asynchronous execution lookup data stream (Credits & Secondary Details query)
-                    const details = await fetchExtendedMovieDetails(chosenMovie.id);
+                    // Determine targeting region for providers context
+                    const localizedCountryCode = countrySelect.value !== 'all' ? countrySelect.value : 'US';
+
+                    // Deep integrated asynchronous pipeline chain request parameters
+                    const advancedDetails = await fetchAdvancedMovieMetadata(chosenMovie.id, localizedCountryCode);
                     
-                    currentMovie = chosenMovie; // Save structural entity context globally
-                    displayMovie(chosenMovie, details.director, details.runtime);
+                    currentMovie = chosenMovie;
+                    displayMovie(chosenMovie, advancedDetails.director, advancedDetails.runtime, advancedDetails.providers);
 
                 } catch (err) {
-                    console.error("TMDB Core Engine exception handling:", err);
+                    console.error("Critical engine component trace failure:", err);
                     showError();
                 } finally {
                     matchBtn.disabled = false;
@@ -614,43 +665,50 @@
                 }
             }
 
-            // High-fidelity integrated wrapper function mapping runtime configuration parameters
-            async function fetchExtendedMovieDetails(movieId) {
+            // Triple-fetch optimization routine linking credits, metadata, and localized streaming engines
+            async function fetchAdvancedMovieMetadata(movieId, countryCode) {
                 let director = "Unknown Director";
                 let runtime = "N/A";
+                let providers = [];
                 
                 try {
-                    // Fetch Crew Credits
                     const creditsPromise = fetch(`${BASE_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`).then(res => res.json());
-                    // Fetch Core Appendices (Runtime metric calculation data payload source)
-                    const mainDetailsPromise = fetch(`${BASE_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}&language=en-US`).then(res => res.json());
+                    const detailsPromise = fetch(`${BASE_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}&language=en-US`).then(res => res.json());
+                    const providersPromise = fetch(`${BASE_URL}/movie/${movieId}/watch/providers?api_key=${TMDB_API_KEY}`).then(res => res.json());
 
-                    const [creditsData, mainData] = await Promise.all([creditsPromise, mainDetailsPromise]);
+                    const [creditsData, detailsData, providersData] = await Promise.all([creditsPromise, detailsPromise, providersPromise]);
 
                     if (creditsData && creditsData.crew) {
-                        const target = creditsData.crew.find(m => m.job === 'Director');
-                        if (target) director = target.name;
+                        const targetDir = creditsData.crew.find(m => m.job === 'Director');
+                        if (targetDir) director = targetDir.name;
                     }
 
-                    if (mainData && mainData.runtime) {
-                        runtime = formatRuntime(mainData.runtime);
+                    if (detailsData && detailsData.runtime) {
+                        runtime = formatRuntimeMetric(detailsData.runtime);
+                    }
+
+                    if (providersData && providersData.results && providersData.results[countryCode]) {
+                        const countryMarket = providersData.results[countryCode];
+                        // Prioritize flatrate subscription platforms
+                        if (countryMarket.flatrate) {
+                            providers = countryMarket.flatrate;
+                        }
                     }
                 } catch (e) {
-                    console.error("Error looking up contextual sub-queries:", e);
+                    console.error("Advanced lookup trace anomaly detected:", e);
                 }
 
-                return { director, runtime };
+                return { director, runtime, providers };
             }
 
-            // Formats integer minutes to clean 'Xh Ym' standard layout
-            function formatRuntime(minutes) {
+            function formatRuntimeMetric(minutes) {
                 if (!minutes) return "N/A";
                 const hours = Math.floor(minutes / 60);
                 const remainingMinutes = minutes % 60;
                 return hours > 0 ? `${hours}h ${remainingMinutes}m` : `${remainingMinutes}m`;
             }
 
-            function displayMovie(movie, director, runtime) {
+            function displayMovie(movie, director, runtime, providers) {
                 errorMsg.style.display = 'none';
 
                 movieTitle.textContent = movie.title;
@@ -663,6 +721,21 @@
                 
                 movieImg.src = `${IMAGE_BASE_URL}${movie.poster_path}`;
                 movieImg.alt = `${movie.title} Movie Poster`;
+
+                // Handle Watch Providers DOM Construction Injection
+                movieProviders.innerHTML = '';
+                if (providers && providers.length > 0) {
+                    providers.forEach(p => {
+                        const img = document.createElement('img');
+                        img.className = 'provider-logo';
+                        img.src = `${PROVIDER_IMAGE_BASE_URL}${p.logo_path}`;
+                        img.alt = p.provider_name;
+                        img.title = p.provider_name; // Triggers tooltip text display on hover state
+                        movieProviders.appendChild(img);
+                    });
+                } else {
+                    movieProviders.innerHTML = `<span class="provider-empty">Not available on major streaming platforms right now.</span>`;
+                }
 
                 updateWatchlistButtonState(movie.id);
 
@@ -679,7 +752,7 @@
             }
 
             // ==========================================
-            // WATCHLIST SYSTEM SUBSURFACE SUBSYSTEMS
+            // LOCALSTORAGE WATCHLIST HOOKS & RENDERING
             // ==========================================
             function getWatchlistData() {
                 const data = localStorage.getItem('cinematch_watchlist');
@@ -706,7 +779,7 @@
                 const index = list.findIndex(item => item.id === currentMovie.id);
 
                 if (index > -1) {
-                    list.splice(index, 1); // Remove from list if already present
+                    list.splice(index, 1);
                 } else {
                     list.push({
                         id: currentMovie.id,
